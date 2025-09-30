@@ -1,0 +1,78 @@
+#include "stm32f767xx.h"
+#include <stdint.h>
+
+//===PINS===
+#define PA3 3
+#define PC0 0
+#define PC3 3
+#define PF13 13
+
+
+//===SENSORS/LEDS CONDITION===
+
+//LEDS
+#define GREEN_ON() GPIOA->BSRR = (1U << PA3)
+#define GREEN_OFF() GPIOA->BSRR = (1U <<(PA3 +16))
+#define RED_ON() GPIOC->BSRR = (1U << PC0)
+#define RED_OFF() GPIOC->BSRR = (1U <<(PC0 +16))
+
+//BUZZER
+#define BUZZER_ON() GPIOC->BSRR = (1U << PC3)
+#define BUZZER_OFF() GPIOC->BSRR = (1U << (PC3 +16))
+
+//OBJ DETECTOR
+#define OBJ_DETECTOR_ON() ((GPIOF->IDR))
+
+//===Func Prototype
+void _init(void);
+
+static inline void delay_ms(uint32_t t);
+
+static void init_LEDS();
+static void init_I2C1();
+static void init_BUZZER();
+static void init_OBJ_DETECTOR();
+
+int main(void){
+
+}
+
+void _init(){}
+
+static inline void delay_ms(uint32_t t){
+    for(volatile int i=0; i<t; i++);
+    __ASM("nop");
+}
+
+static void init_LEDS(){
+    //===Enable GPIOA and GPIOC clocks===
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+
+    //=== SEt PA3 and PC0 as output===
+    GPIOA->MODER &= ~(3U << (PA3 *2)); //Clear mode
+    GPIOA->MODER |= (1U <<( PA3 *2)); // Set as output
+    GPIOA->OTYPER &= ~(1U << (PA3)); // Set as push-pull
+    GPIOA->OSPEEDR &= ~(3U <<(PA3 *2)); // Set as low speed
+    GPIOA->PUPDR &= ~(3U << (PA3 *2)); // No pull up/down
+    GREEN_OFF();
+
+    GPIOC->MODER &= ~(3U <<( PC0 *2)); // Clear mode
+    GPIOC->MODER |= (1U << (PC0 *2)); // Set as output
+    GPIOC->OTYPER &= ~(1U << (PC0)); // Set as push pull
+    GPIOC->OSPEEDR &= ~ (3U << (PC0 *2)); // Low speed
+    GPIOC->PUPDR &= ~(3U << (PC0 *2)); // No pull up/down
+    RED_OFF();
+}
+
+static void init_BUZZER(){
+    //===ENABLE CLOCK AND INIT BUZZER===
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+
+    GPIOC->MODER &= ~(3U << (PC3 *2)); // Clear BITS
+    GPIOC->MODER |= (1U << (PC3 *2)); // Set as output
+    GPIOC->OTYPER &= ~(1U << (PC3)); // Set as push pull
+    GPIOC->OSPEEDR &= ~(3U << (PC3 *2)); // Set as low speed
+    GPIOC->PUPDR &= ~(3U << (PC3 *2)); // No pull up/down
+
+}

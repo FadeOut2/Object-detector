@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cortex Debug (OpenOCD)",
+      "type": "cortex-debug",
+      "request": "launch",
+      "servertype": "openocd",
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceFolder}/build/OBJ-DETECTOR.elf", // <-- path to ELF
+      "device": "STM32F767ZI", // your MCU
+      "configFiles": [
+        "interface/stlink.cfg",
+        "target/stm32f7x.cfg"
+      ],
+      "runToEntryPoint": "main",
+      "svdFile": "${workspaceFolder}/STM32F7xx.svd", // optional but helps
+      "preLaunchTask": "build" // optional, matches your tasks.json
+    }
+  ]
+}
